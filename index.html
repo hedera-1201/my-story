@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 · 契约论坛</title>
+    <!-- 预加载新背景图 -->
+    <link rel="preload" as="image" href="https://i.postimg.cc/PxDRRQT6/ning-shi-1-yin-shuang-yu-xue-lai-zi-xiao-hong-shu-wang-ye-ban.jpg">
+    <style>
+        /* 全局重置与字体 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: background 0.2s;
+            overflow-x: hidden;
+        }
+
+        /* 主容器 — 纯白 */
+        .forum-wrapper {
+            max-width: 780px;
+            width: 100%;
+            background: white;
+            padding: 0 20px 40px;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* ----- 导航栏 (蓝色) ----- */
+        .navbar {
+            background: #1a5cff;
+            padding: 16px 24px;
+            border-radius: 0 0 12px 12px;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 6px rgba(26, 92, 255, 0.15);
+        }
+        .navbar-brand {
+            font-size: 22px;
+            font-weight: 600;
+            color: white;
+            letter-spacing: 0.3px;
+            text-align: left;
+        }
+
+        /* ----- 顶部灰色圆形 + 小字 ----- */
+        .top-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding: 4px 0;
+        }
+        .grey-circle {
+            width: 38px;
+            height: 38px;
+            background: #d1d5db;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .error-code {
+            color: #3b3b3b;
+            font-size: 14px;
+            letter-spacing: 0.4px;
+            background: #f3f4f6;
+            padding: 4px 14px 4px 12px;
+            border-radius: 30px;
+            font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
+            font-weight: 400;
+            word-break: break-all;
+        }
+
+        /* ----- 帖子主体 (纯白) ----- */
+        .post-card {
+            background: white;
+            padding: 8px 0 16px 0;
+            border: none;
+            box-shadow: none;
+        }
+
+        .post-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #111;
+            margin-bottom: 4px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 10px 14px;
+        }
+        .post-date {
+            font-size: 14px;
+            font-weight: 400;
+            color: #7a7a7a;
+            white-space: nowrap;
+        }
+
+        .post-content {
+            margin: 12px 0 20px 0;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #1e1e1e;
+        }
+
+        /* 永远显示灰色 “暂无回复。” */
+        .no-reply {
+            color: #7a7a7a;
+            font-size: 14px;
+            margin: 12px 0 22px 0;
+            letter-spacing: 0.2px;
+        }
+
+        /* ----- 回复输入区域 (纯白) ----- */
+        .reply-area {
+            background: white;
+            margin-top: 8px;
+        }
+
+        .reply-input-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: white;
+            border: 1px solid #e6e8ec;
+            border-radius: 8px;
+            padding: 4px 4px 4px 16px;
+            transition: border 0.2s;
+        }
+        .reply-input-wrap:focus-within {
+            border-color: #1a5cff;
+            box-shadow: 0 0 0 2px rgba(26, 92, 255, 0.08);
+        }
+
+        .reply-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: white;
+            font-size: 15px;
+            padding: 12px 0;
+            color: #111;
+            min-width: 0;
+        }
+        .reply-input::placeholder {
+            color: #9aa0a8;
+            font-weight: 350;
+            opacity: 1;
+        }
+
+        .publish-btn {
+            background: #1a5cff;
+            border: none;
+            color: white;
+            font-size: 15px;
+            font-weight: 500;
+            padding: 8px 20px;
+            border-radius: 6px;
+            cursor: not-allowed;
+            opacity: 0.5;
+            transition: opacity 0.15s, background 0.15s;
+            flex-shrink: 0;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+        .publish-btn.active {
+            opacity: 1;
+            cursor: pointer;
+            pointer-events: auto;
+            background: #1a5cff;
+        }
+        .publish-btn.active:hover {
+            background: #0f4ad0;
+        }
+
+        /* ----- 第二页面 (新背景图 + 眩晕模糊动画) ----- */
+        .second-page {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 999;
+            background: #0b0b0b;
+            /* 使用新的背景图链接 */
+            background-image: url('https://i.postimg.cc/PxDRRQT6/ning-shi-1-yin-shuang-yu-xue-lai-zi-xiao-hong-shu-wang-ye-ban.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 20px;
+            opacity: 0;
+            /* 过渡动画：结合模糊和位移产生眩晕感 */
+            transition: opacity 0.8s cubic-bezier(0.2, 0.9, 0.3, 1.1), filter 0.8s ease, transform 0.8s ease;
+            filter: blur(8px) brightness(0.6);
+            transform: scale(1.04) rotate(0.5deg);
+        }
+        .second-page.show {
+            display: flex;
+            opacity: 1;
+            filter: blur(0px) brightness(1);
+            transform: scale(1) rotate(0deg);
+        }
+
+        /* 上下黑色边框 */
+        .dark-frame {
+            max-width: 600px;
+            width: 100%;
+            background: transparent;
+            border-top: 12px solid #0b0b0b;
+            border-bottom: 12px solid #0b0b0b;
+            padding: 48px 32px 40px;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(1px);
+            border-radius: 4px;
+            /* 内部元素也轻微晃动，增强眩晕感 */
+            animation: subtleFloat 3s ease-in-out infinite alternate;
+        }
+        @keyframes subtleFloat {
+            0% { transform: translateY(0px) rotate(-0.3deg); }
+            100% { transform: translateY(6px) rotate(0.3deg); }
+        }
+
+        .dark-message {
+            color: white;
+            font-size: 18px;
+            line-height: 1.7;
+            text-align: center;
+            font-weight: 300;
+            letter-spacing: 0.6px;
+            max-width: 480px;
+            margin: 0 auto 28px;
+            font-family: 'Times New Roman', 'Songti SC', serif;
+            transform: rotate(-0.5deg);
+            text-shadow: 0 0 6px rgba(255,255,255,0.1);
+        }
+        .dark-message .small-crooked {
+            font-size: 17px;
+            display: block;
+            margin-top: 8px;
+            font-family: 'Courier New', 'Songti SC', monospace;
+            transform: rotate(0.5deg) scale(0.98);
+            opacity: 0.9;
+        }
+
+        /* 同意按钮 + 倒计时 (倒计时在按钮下方) */
+        .agree-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            margin-top: 8px;
+            width: 100%;
+        }
+
+        .agree-btn {
+            background: #0b0b0b;
+            border: 2px solid #2a2a2a;
+            color: #888;
+            font-size: 20px;
+            font-weight: 400;
+            padding: 14px 48px;
+            border-radius: 6px;
+            cursor: not-allowed;
+            pointer-events: none;
+            background: #111;
+            letter-spacing: 2px;
+            transition: 0.2s;
+            box-shadow: 0 0 10px rgba(0,0,0,0.8);
+            font-family: 'Times New Roman', serif;
+            width: 100%;
+            max-width: 220px;
+            text-align: center;
+        }
+        .agree-btn.active {
+            color: white;
+            cursor: pointer;
+            pointer-events: auto;
+            border-color: #666;
+        }
+        .agree-btn.active:hover {
+            background: #1f1f1f;
+            border-color: #999;
+            transform: scale(1.01);
+        }
+
+        /* 倒计时：红色小字，位于同意下方 */
+        .countdown-timer {
+            color: #ff3b30;
+            font-size: 18px;
+            font-weight: 600;
+            font-family: 'SF Mono', 'Courier New', monospace;
+            background: rgba(0,0,0,0.3);
+            padding: 4px 16px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 59, 48, 0.2);
+            letter-spacing: 1px;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        /* 加载中指示器 (含旋转光标) */
+        .loading-indicator {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(3px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .loading-indicator.show {
+            display: flex;
+        }
+
+        /* 旋转光标 (纯CSS) */
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 5px solid #d1d5db;
+            border-top: 5px solid #1a5cff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading-text {
+            color: #1a5cff;
+            font-size: 18px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 500px) {
+            .navbar-brand { font-size: 20px; }
+            .post-title { font-size: 22px; }
+            .reply-input-wrap { flex-wrap: nowrap; }
+            .publish-btn { padding: 8px 16px; font-size: 14px; }
+            .dark-message { font-size: 16px; }
+            .countdown-timer { font-size: 16px; }
+            .dark-frame { animation: none; } /* 小屏减弱晃动 */
+        }
+    </style>
+</head>
+<body>
+    <!-- 加载中指示器 (含旋转光标) -->
+    <div class="loading-indicator" id="loadingIndicator">
+        <div class="spinner"></div>
+        <div class="loading-text">加载中...</div>
+    </div>
+
+    <!-- 主论坛 (白色) -->
+    <div class="forum-wrapper" id="forumWrapper">
+        <nav class="navbar">
+            <div class="navbar-brand">论坛</div>
+        </nav>
+
+        <div class="top-meta">
+            <div class="grey-circle"></div>
+            <span class="error-code">�RUN�ERR�0x7F</span>
+        </div>
+
+        <div class="post-card">
+            <div class="post-title">
+                <span>你愿意建立契约吗？</span>
+                <span class="post-date">2026.7.18 21:33</span>
+            </div>
+            <div class="post-content">
+                点击发布快来快来快来快来快来快来快来快来快来快来快来
+            </div>
+            <!-- 永远显示“暂无回复。” -->
+            <div class="no-reply" id="noReplyText">暂无回复。</div>
+
+            <div class="reply-area">
+                <div class="reply-input-wrap">
+                    <input type="text" class="reply-input" id="replyInput" placeholder="说点什么吧" autocomplete="off">
+                    <button class="publish-btn" id="publishBtn">发布</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第二页面 (新背景图 + 眩晕模糊动画) -->
+    <div class="second-page" id="secondPage">
+        <div class="dark-frame">
+            <div class="dark-message">
+                你好，亲爱的丝枢。<br>
+                欢迎来到精神最深层——髓核层。<br>
+                <span class="small-crooked">请你点击下方同意，成为祂的脐亲。</span>
+            </div>
+
+            <div class="agree-wrapper">
+                <!-- 同意按钮 -->
+                <button class="agree-btn" id="agreeBtn">同意</button>
+                <!-- 倒计时 (红色小字，在同意下方) -->
+                <div class="countdown-timer" id="countdownDisplay">10</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // 预加载新背景图
+            const bgImg = new Image();
+            bgImg.src = 'https://i.postimg.cc/PxDRRQT6/ning-shi-1-yin-shuang-yu-xue-lai-zi-xiao-hong-shu-wang-ye-ban.jpg';
+
+            // DOM 元素
+            const replyInput = document.getElementById('replyInput');
+            const publishBtn = document.getElementById('publishBtn');
+            const secondPage = document.getElementById('secondPage');
+            const agreeBtn = document.getElementById('agreeBtn');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const countdownDisplay = document.getElementById('countdownDisplay');
+
+            // 倒计时相关
+            let countdownInterval = null;
+            let countdownValue = 10;
+            let isCountdownActive = false;
+
+            // 初始状态：发布按钮不可用
+            publishBtn.classList.remove('active');
+            publishBtn.disabled = true;
+
+            // 监听输入 —— 控制发布按钮
+            replyInput.addEventListener('input', function() {
+                const val = this.value.trim();
+                if (val.length > 0) {
+                    publishBtn.classList.add('active');
+                    publishBtn.disabled = false;
+                } else {
+                    publishBtn.classList.remove('active');
+                    publishBtn.disabled = true;
+                }
+            });
+
+            // 核心：点击发布 → 显示加载 (旋转光标) → 跳转第二页面 (带眩晕模糊)
+            function handlePublish() {
+                const val = replyInput.value.trim();
+                if (val.length === 0) return;
+
+                // 1. 显示加载中 (含旋转光标)
+                loadingIndicator.classList.add('show');
+
+                // 2. 模拟加载时间 (2.5秒)，背景图已预加载
+                setTimeout(() => {
+                    loadingIndicator.classList.remove('show');
+
+                    // 3. 显示第二页面 (触发眩晕模糊过渡)
+                    secondPage.classList.add('show');
+
+                    // 4. 清空输入框，禁用发布按钮
+                    replyInput.value = '';
+                    publishBtn.classList.remove('active');
+                    publishBtn.disabled = true;
+
+                    // 5. 启动倒计时 (10秒)
+                    startCountdown();
+
+                }, 2500);
+            }
+
+            // 倒计时逻辑
+            function startCountdown() {
+                if (countdownInterval) {
+                    clearInterval(countdownInterval);
+                    countdownInterval = null;
+                }
+
+                countdownValue = 10;
+                countdownDisplay.textContent = countdownValue;
+                agreeBtn.classList.remove('active');
+                agreeBtn.style.color = '#888';
+                agreeBtn.style.cursor = 'not-allowed';
+                agreeBtn.style.pointerEvents = 'none';
+                isCountdownActive = true;
+
+                countdownInterval = setInterval(() => {
+                    countdownValue -= 1;
+                    countdownDisplay.textContent = countdownValue;
+
+                    if (countdownValue <= 0) {
+                        clearInterval(countdownInterval);
+                        countdownInterval = null;
+                        countdownDisplay.textContent = '0';
+                        agreeBtn.classList.add('active');
+                        agreeBtn.style.color = 'white';
+                        agreeBtn.style.cursor = 'pointer';
+                        agreeBtn.style.pointerEvents = 'auto';
+                        isCountdownActive = false;
+                    }
+                }, 1000);
+            }
+
+            // 绑定发布事件
+            publishBtn.addEventListener('click', function(e) {
+                if (this.disabled) return;
+                handlePublish();
+            });
+
+            // 回车键发布
+            replyInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    const val = this.value.trim();
+                    if (val.length > 0 && publishBtn.classList.contains('active')) {
+                        e.preventDefault();
+                        handlePublish();
+                    }
+                }
+            });
+
+            // 点击“同意” → 关闭第二页面，回到论坛
+            agreeBtn.addEventListener('click', function() {
+                if (!this.classList.contains('active')) return;
+
+                secondPage.classList.remove('show');
+
+                if (countdownInterval) {
+                    clearInterval(countdownInterval);
+                    countdownInterval = null;
+                }
+                countdownDisplay.textContent = '10';
+                agreeBtn.classList.remove('active');
+                agreeBtn.style.color = '#888';
+                agreeBtn.style.cursor = 'not-allowed';
+                agreeBtn.style.pointerEvents = 'none';
+                isCountdownActive = false;
+
+                replyInput.value = '';
+                publishBtn.classList.remove('active');
+                publishBtn.disabled = true;
+            });
+
+            // 点击第二页面背景不关闭 (仅同意关闭)
+            secondPage.addEventListener('click', function(e) {
+                if (e.target === secondPage) {
+                    // 不关闭
+                }
+            });
+
+            console.log('2026 契约论坛 · 新背景图 + 眩晕模糊效果');
+        })();
+    </script>
+</body>
+</html>
