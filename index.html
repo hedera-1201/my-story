@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026 · 契约论坛</title>
-    <!-- 预加载新背景图 -->
+    <title>my story</title> <!-- 网页标题已修改 -->
+    <!-- 预加载背景图 -->
     <link rel="preload" as="image" href="https://i.postimg.cc/PxDRRQT6/ning-shi-1-yin-shuang-yu-xue-lai-zi-xiao-hong-shu-wang-ye-ban.jpg">
     <style>
-        /* 全局重置与字体 */
+        /* --- 全局重置 --- */
         * {
             margin: 0;
             padding: 0;
@@ -21,43 +21,166 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            transition: background 0.2s;
             overflow-x: hidden;
         }
 
-        /* 主容器 — 纯白 */
+        /* ===== 第零个界面 (黑色警告页) ===== */
+        .zero-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 10000;
+            background: #000000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 24px;
+            transition: opacity 1.2s ease, filter 1.2s ease;
+            opacity: 1;
+            filter: blur(0px) brightness(1);
+            pointer-events: auto;
+        }
+        .zero-page.hidden {
+            opacity: 0;
+            filter: blur(8px) brightness(1.8);
+            pointer-events: none;
+        }
+
+        /* 警告标题 - 红色发光 */
+        .warning-title {
+            color: #ff1a1a;
+            font-size: 52px;
+            font-weight: 800;
+            letter-spacing: 6px;
+            font-family: 'Impact', 'Arial Black', sans-serif;
+            /* 红色发光效果 */
+            text-shadow: 0 0 20px rgba(255, 0, 0, 0.8),
+                         0 0 40px rgba(255, 0, 0, 0.6),
+                         0 0 80px rgba(255, 0, 0, 0.4),
+                         0 0 120px rgba(255, 0, 0, 0.2);
+            margin-bottom: 28px;
+            animation: pulseGlow 2s ease-in-out infinite;
+        }
+        @keyframes pulseGlow {
+            0% {
+                text-shadow: 0 0 20px rgba(255,0,0,0.6), 0 0 40px rgba(255,0,0,0.4), 0 0 80px rgba(255,0,0,0.2);
+                opacity: 0.9;
+            }
+            50% {
+                text-shadow: 0 0 30px rgba(255,0,0,1), 0 0 60px rgba(255,0,0,0.8), 0 0 100px rgba(255,0,0,0.5), 0 0 140px rgba(255,0,0,0.3);
+                opacity: 1;
+            }
+            100% {
+                text-shadow: 0 0 20px rgba(255,0,0,0.6), 0 0 40px rgba(255,0,0,0.4), 0 0 80px rgba(255,0,0,0.2);
+                opacity: 0.9;
+            }
+        }
+
+        /* 警告正文 - 也带微弱红光 */
+        .warning-text {
+            color: #ff4d4d;
+            font-size: 16px;
+            line-height: 1.8;
+            max-width: 640px;
+            text-align: center;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+            margin-bottom: 42px;
+            padding: 0 10px;
+            text-shadow: 0 0 15px rgba(255, 0, 0, 0.25);
+        }
+
+        /* 继续按钮 */
+        .continue-btn {
+            background: transparent;
+            border: 1.5px solid #ff3333;
+            color: #ff3333;
+            font-size: 18px;
+            font-weight: 500;
+            padding: 12px 44px;
+            border-radius: 4px;
+            cursor: pointer;
+            letter-spacing: 3px;
+            transition: all 0.3s ease;
+            background: rgba(255, 0, 0, 0.05);
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+        }
+        .continue-btn:hover {
+            background: rgba(255, 0, 0, 0.15);
+            box-shadow: 0 0 40px rgba(255, 0, 0, 0.4);
+            transform: scale(1.02);
+        }
+        .continue-btn:active {
+            transform: scale(0.97);
+        }
+
+        /* 光散模糊过渡效果 */
+        .zero-page.transitioning {
+            animation: lightScatter 1.6s ease forwards;
+        }
+        @keyframes lightScatter {
+            0% {
+                opacity: 1;
+                filter: blur(0px) brightness(1);
+                transform: scale(1);
+            }
+            30% {
+                opacity: 1;
+                filter: blur(4px) brightness(1.6);
+                transform: scale(1.02);
+            }
+            60% {
+                opacity: 0.8;
+                filter: blur(12px) brightness(2.2);
+                transform: scale(1.08);
+            }
+            100% {
+                opacity: 0;
+                filter: blur(20px) brightness(2.8);
+                transform: scale(1.15);
+                pointer-events: none;
+            }
+        }
+
+        /* ===== 主论坛容器 ===== */
         .forum-wrapper {
             max-width: 780px;
             width: 100%;
             background: white;
             padding: 0 20px 40px;
             min-height: 100vh;
-            position: relative;
+            opacity: 0;
+            transition: opacity 1s ease 0.3s;
+        }
+        .forum-wrapper.visible {
+            opacity: 1;
         }
 
-        /* ----- 导航栏 (蓝色) ----- */
+        /* --- 导航栏 --- */
         .navbar {
             background: #1a5cff;
             padding: 16px 24px;
             border-radius: 0 0 12px 12px;
             margin-bottom: 32px;
-            box-shadow: 0 2px 6px rgba(26, 92, 255, 0.15);
         }
         .navbar-brand {
             font-size: 22px;
             font-weight: 600;
             color: white;
-            letter-spacing: 0.3px;
-            text-align: left;
         }
 
-        /* ----- 顶部灰色圆形 + 小字 ----- */
+        /* --- 顶部灰色圆形 + 代码 --- */
         .top-meta {
             display: flex;
             align-items: center;
             gap: 12px;
             margin-bottom: 24px;
-            padding: 4px 0;
         }
         .grey-circle {
             width: 38px;
@@ -69,23 +192,17 @@
         .error-code {
             color: #3b3b3b;
             font-size: 14px;
-            letter-spacing: 0.4px;
             background: #f3f4f6;
             padding: 4px 14px 4px 12px;
             border-radius: 30px;
-            font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
-            font-weight: 400;
-            word-break: break-all;
+            font-family: monospace;
         }
 
-        /* ----- 帖子主体 (纯白) ----- */
+        /* --- 帖子主体 --- */
         .post-card {
             background: white;
             padding: 8px 0 16px 0;
-            border: none;
-            box-shadow: none;
         }
-
         .post-title {
             font-size: 26px;
             font-weight: 700;
@@ -102,28 +219,37 @@
             color: #7a7a7a;
             white-space: nowrap;
         }
-
         .post-content {
             margin: 12px 0 20px 0;
             font-size: 16px;
             line-height: 1.6;
             color: #1e1e1e;
+            word-break: break-word;
         }
 
-        /* 永远显示灰色 “暂无回复。” */
+        /* --- 评论区 --- */
+        .reply-section {
+            margin-top: 8px;
+        }
+        .divider-line {
+            border: none;
+            border-top: 1.5px dashed #b0b0b0;
+            margin: 16px 0 14px 0;
+            width: 100%;
+        }
+        .comment-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 6px;
+        }
         .no-reply {
             color: #7a7a7a;
             font-size: 14px;
-            margin: 12px 0 22px 0;
             letter-spacing: 0.2px;
         }
 
-        /* ----- 回复输入区域 (纯白) ----- */
-        .reply-area {
-            background: white;
-            margin-top: 8px;
-        }
-
+        /* --- 回复输入区域 --- */
         .reply-input-wrap {
             display: flex;
             align-items: center;
@@ -132,13 +258,12 @@
             border: 1px solid #e6e8ec;
             border-radius: 8px;
             padding: 4px 4px 4px 16px;
-            transition: border 0.2s;
+            margin-top: 16px;
         }
         .reply-input-wrap:focus-within {
             border-color: #1a5cff;
             box-shadow: 0 0 0 2px rgba(26, 92, 255, 0.08);
         }
-
         .reply-input {
             flex: 1;
             border: none;
@@ -147,14 +272,10 @@
             font-size: 15px;
             padding: 12px 0;
             color: #111;
-            min-width: 0;
         }
         .reply-input::placeholder {
             color: #9aa0a8;
-            font-weight: 350;
-            opacity: 1;
         }
-
         .publish-btn {
             background: #1a5cff;
             border: none;
@@ -165,8 +286,7 @@
             border-radius: 6px;
             cursor: not-allowed;
             opacity: 0.5;
-            transition: opacity 0.15s, background 0.15s;
-            flex-shrink: 0;
+            transition: opacity 0.15s;
             height: 44px;
             display: flex;
             align-items: center;
@@ -177,66 +297,210 @@
             opacity: 1;
             cursor: pointer;
             pointer-events: auto;
-            background: #1a5cff;
         }
         .publish-btn.active:hover {
             background: #0f4ad0;
         }
 
-        /* ----- 第二页面 (新背景图 + 眩晕模糊动画) ----- */
+        /* ===== 第二页面 (背景拉到巨大，彻底覆盖) ===== */
         .second-page {
             display: none;
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             z-index: 999;
-            background: #0b0b0b;
-            /* 使用新的背景图链接 */
-            background-image: url('https://i.postimg.cc/PxDRRQT6/ning-shi-1-yin-shuang-yu-xue-lai-zi-xiao-hong-shu-wang-ye-ban.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
             align-items: center;
             justify-content: center;
             flex-direction: column;
             padding: 20px;
             opacity: 0;
-            /* 过渡动画：结合模糊和位移产生眩晕感 */
-            transition: opacity 0.8s cubic-bezier(0.2, 0.9, 0.3, 1.1), filter 0.8s ease, transform 0.8s ease;
-            filter: blur(8px) brightness(0.6);
-            transform: scale(1.04) rotate(0.5deg);
+            transition: opacity 1.8s cubic-bezier(0.1, 0.8, 0.2, 1);
+            pointer-events: none;
+            will-change: opacity;
+            overflow: hidden;
+            background: #0b0b0b;
         }
+
+        .second-page-bg {
+            position: absolute;
+            top: -30%;
+            left: -30%;
+            width: 160%;
+            height: 160%;
+            z-index: 0;
+            background-image: url('https://i.postimg.cc/PxDRRQT6/ning-shi-1-yin-shuang-yu-xue-lai-zi-xiao-hong-shu-wang-ye-ban.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            pointer-events: none;
+            will-change: transform, filter;
+            transform-origin: center center;
+            filter: blur(32px) brightness(0.15) saturate(0.1);
+            transform: rotate(0deg) scale(1.8);
+            transition: filter 4.5s cubic-bezier(0.1, 0.8, 0.2, 1),
+                        transform 4.5s cubic-bezier(0.1, 0.8, 0.2, 1);
+        }
+
+        .second-page-bg::before,
+        .second-page-bg::after {
+            content: '';
+            position: absolute;
+            top: -30%;
+            left: -30%;
+            width: 160%;
+            height: 160%;
+            background: inherit;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            pointer-events: none;
+            mix-blend-mode: screen;
+            opacity: 0;
+            transition: opacity 4.5s ease;
+            will-change: transform, filter, opacity;
+            transform-origin: center center;
+        }
+        .second-page-bg::before {
+            filter: blur(14px) hue-rotate(20deg) saturate(2.8);
+            transform: translate(30px, -20px) scale(1.08);
+        }
+        .second-page-bg::after {
+            filter: blur(14px) hue-rotate(-20deg) saturate(2.8);
+            transform: translate(-30px, 20px) scale(1.08);
+        }
+
         .second-page.show {
             display: flex;
             opacity: 1;
-            filter: blur(0px) brightness(1);
-            transform: scale(1) rotate(0deg);
+            pointer-events: auto;
         }
 
-        /* 上下黑色边框 */
+        .second-page.show .second-page-bg {
+            filter: blur(0px) brightness(1) saturate(1);
+            transform: rotate(0deg) scale(1);
+            animation: slowChurn 8s cubic-bezier(0.2, 0.9, 0.3, 1) 0.2s 1 both,
+                       infiniteSpin 50s linear 8.5s infinite;
+        }
+
+        .second-page.show .second-page-bg::before,
+        .second-page.show .second-page-bg::after {
+            opacity: 0.6;
+            animation: chromaticRise 4.5s ease 0.2s 1 both,
+                       chromaticFloat 35s ease-in-out 4.8s infinite alternate;
+        }
+        .second-page.show .second-page-bg::after {
+            animation-name: chromaticRiseAfter, chromaticFloatAfter;
+        }
+
+        @keyframes slowChurn {
+            0% {
+                transform: rotate(0deg) scale(1.8) translate(0, 0);
+                filter: blur(32px) brightness(0.12) saturate(0.1);
+            }
+            15% {
+                transform: rotate(20deg) scale(1.7) translate(50px, -40px);
+                filter: blur(24px) brightness(0.2) saturate(0.3);
+            }
+            35% {
+                transform: rotate(-16deg) scale(1.6) translate(-45px, 35px);
+                filter: blur(16px) brightness(0.35) saturate(0.5);
+            }
+            55% {
+                transform: rotate(12deg) scale(1.4) translate(35px, -25px);
+                filter: blur(10px) brightness(0.5) saturate(0.7);
+            }
+            75% {
+                transform: rotate(-8deg) scale(1.2) translate(-20px, 15px);
+                filter: blur(4px) brightness(0.75) saturate(0.9);
+            }
+            100% {
+                transform: rotate(0deg) scale(1) translate(0, 0);
+                filter: blur(0px) brightness(1) saturate(1);
+            }
+        }
+
+        @keyframes infiniteSpin {
+            0% { transform: rotate(0deg) scale(1); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        @keyframes chromaticRise {
+            0% {
+                opacity: 0;
+                transform: translate(50px, -30px) scale(1.12);
+                filter: blur(22px) hue-rotate(28deg);
+            }
+            50% {
+                opacity: 0.8;
+                transform: translate(18px, -10px) scale(1.05);
+                filter: blur(8px) hue-rotate(10deg);
+            }
+            100% {
+                opacity: 0.6;
+                transform: translate(0, 0) scale(1);
+                filter: blur(0px) hue-rotate(0deg);
+            }
+        }
+        @keyframes chromaticRiseAfter {
+            0% {
+                opacity: 0;
+                transform: translate(-50px, 30px) scale(1.12);
+                filter: blur(22px) hue-rotate(-28deg);
+            }
+            50% {
+                opacity: 0.8;
+                transform: translate(-18px, 10px) scale(1.05);
+                filter: blur(8px) hue-rotate(-10deg);
+            }
+            100% {
+                opacity: 0.6;
+                transform: translate(0, 0) scale(1);
+                filter: blur(0px) hue-rotate(0deg);
+            }
+        }
+
+        @keyframes chromaticFloat {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+            25% { transform: translate(15px, -10px) scale(1.03) rotate(2.5deg); }
+            50% { transform: translate(-10px, 15px) scale(0.97) rotate(-2.5deg); }
+            75% { transform: translate(8px, -5px) scale(1.02) rotate(1.5deg); }
+            100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+        }
+        @keyframes chromaticFloatAfter {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+            25% { transform: translate(-15px, 10px) scale(1.03) rotate(-2.5deg); }
+            50% { transform: translate(10px, -15px) scale(0.97) rotate(2.5deg); }
+            75% { transform: translate(-8px, 5px) scale(1.02) rotate(-1.5deg); }
+            100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+        }
+
+        /* 文字内容层 */
         .dark-frame {
             max-width: 600px;
             width: 100%;
-            background: transparent;
             border-top: 12px solid #0b0b0b;
             border-bottom: 12px solid #0b0b0b;
             padding: 48px 32px 40px;
-            position: relative;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(3px);
+            border-radius: 4px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            background: rgba(0, 0, 0, 0.25);
-            backdrop-filter: blur(1px);
-            border-radius: 4px;
-            /* 内部元素也轻微晃动，增强眩晕感 */
-            animation: subtleFloat 3s ease-in-out infinite alternate;
+            box-shadow: 0 0 80px rgba(0,0,0,0.8);
+            position: relative;
+            z-index: 2;
+            filter: none !important;
+            -webkit-font-smoothing: antialiased;
+            animation: textWiggle 6s ease-in-out infinite alternate;
         }
-        @keyframes subtleFloat {
-            0% { transform: translateY(0px) rotate(-0.3deg); }
-            100% { transform: translateY(6px) rotate(0.3deg); }
+        @keyframes textWiggle {
+            0% { transform: translateY(0px) rotate(-0.8deg); }
+            30% { transform: translateY(8px) rotate(1deg); }
+            60% { transform: translateY(-5px) rotate(-0.6deg); }
+            100% { transform: translateY(10px) rotate(0.8deg); }
         }
 
         .dark-message {
@@ -245,34 +509,30 @@
             line-height: 1.7;
             text-align: center;
             font-weight: 300;
-            letter-spacing: 0.6px;
             max-width: 480px;
             margin: 0 auto 28px;
             font-family: 'Times New Roman', 'Songti SC', serif;
-            transform: rotate(-0.5deg);
-            text-shadow: 0 0 6px rgba(255,255,255,0.1);
+            text-shadow: 0 0 20px rgba(0,0,0,0.9);
+            filter: none !important;
+            -webkit-font-smoothing: antialiased;
         }
         .dark-message .small-crooked {
             font-size: 17px;
             display: block;
             margin-top: 8px;
-            font-family: 'Courier New', 'Songti SC', monospace;
-            transform: rotate(0.5deg) scale(0.98);
+            font-family: 'Courier New', monospace;
             opacity: 0.9;
         }
 
-        /* 同意按钮 + 倒计时 (倒计时在按钮下方) */
         .agree-wrapper {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 12px;
-            margin-top: 8px;
             width: 100%;
         }
-
         .agree-btn {
-            background: #0b0b0b;
+            background: #111;
             border: 2px solid #2a2a2a;
             color: #888;
             font-size: 20px;
@@ -281,14 +541,12 @@
             border-radius: 6px;
             cursor: not-allowed;
             pointer-events: none;
-            background: #111;
             letter-spacing: 2px;
-            transition: 0.2s;
-            box-shadow: 0 0 10px rgba(0,0,0,0.8);
             font-family: 'Times New Roman', serif;
             width: 100%;
             max-width: 220px;
             text-align: center;
+            transition: 0.2s;
         }
         .agree-btn.active {
             color: white;
@@ -299,25 +557,20 @@
         .agree-btn.active:hover {
             background: #1f1f1f;
             border-color: #999;
-            transform: scale(1.01);
         }
 
-        /* 倒计时：红色小字，位于同意下方 */
         .countdown-timer {
             color: #ff3b30;
             font-size: 18px;
             font-weight: 600;
-            font-family: 'SF Mono', 'Courier New', monospace;
-            background: rgba(0,0,0,0.3);
+            font-family: monospace;
+            background: rgba(0,0,0,0.5);
             padding: 4px 16px;
             border-radius: 30px;
-            border: 1px solid rgba(255, 59, 48, 0.2);
-            letter-spacing: 1px;
-            min-width: 50px;
-            text-align: center;
+            border: 1px solid rgba(255, 59, 48, 0.3);
         }
 
-        /* 加载中指示器 (含旋转光标) */
+        /* --- 加载指示器 --- */
         .loading-indicator {
             display: none;
             position: fixed;
@@ -334,8 +587,6 @@
         .loading-indicator.show {
             display: flex;
         }
-
-        /* 旋转光标 (纯CSS) */
         .spinner {
             width: 48px;
             height: 48px;
@@ -344,41 +595,64 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
         .loading-text {
             color: #1a5cff;
             font-size: 18px;
             font-weight: 500;
-            letter-spacing: 0.5px;
         }
 
         /* 响应式 */
         @media (max-width: 500px) {
-            .navbar-brand { font-size: 20px; }
+            .warning-title { font-size: 36px; }
+            .warning-text { font-size: 14px; }
+            .continue-btn { font-size: 16px; padding: 10px 32px; }
             .post-title { font-size: 22px; }
-            .reply-input-wrap { flex-wrap: nowrap; }
-            .publish-btn { padding: 8px 16px; font-size: 14px; }
             .dark-message { font-size: 16px; }
-            .countdown-timer { font-size: 16px; }
-            .dark-frame { animation: none; } /* 小屏减弱晃动 */
+            .dark-frame { animation: none; }
+            .second-page.show .second-page-bg {
+                animation: slowChurn 6s cubic-bezier(0.2, 0.9, 0.3, 1) 0.2s 1 both,
+                           infiniteSpin 40s linear 6.5s infinite;
+            }
+            .second-page-bg {
+                top: -40%;
+                left: -40%;
+                width: 180%;
+                height: 180%;
+            }
+            .second-page-bg::before,
+            .second-page-bg::after {
+                top: -40%;
+                left: -40%;
+                width: 180%;
+                height: 180%;
+            }
+            @keyframes slowChurn {
+                0% { transform: rotate(0deg) scale(1.6) translate(0, 0); filter: blur(24px) brightness(0.12); }
+                20% { transform: rotate(16deg) scale(1.5) translate(30px, -20px); filter: blur(14px); }
+                50% { transform: rotate(-12deg) scale(1.3) translate(-25px, 18px); filter: blur(6px); }
+                80% { transform: rotate(6deg) scale(1.1) translate(15px, -8px); filter: blur(2px); }
+                100% { transform: rotate(0deg) scale(1) translate(0, 0); filter: blur(0px); }
+            }
         }
     </style>
 </head>
 <body>
-    <!-- 加载中指示器 (含旋转光标) -->
-    <div class="loading-indicator" id="loadingIndicator">
-        <div class="spinner"></div>
-        <div class="loading-text">加载中...</div>
+
+    <!-- ===== 第零个界面 (黑色警告页，红色发光) ===== -->
+    <div class="zero-page" id="zeroPage">
+        <div class="warning-title">WARNING</div>
+        <div class="warning-text">
+            游戏内包含突脸、闪烁、血腥暴力等画面，可能会引起癫痫症状，如：头晕目眩、肌肉痉挛等。<br>
+            如果感觉身体不适，请立即停止游戏并就医。<br>
+            如有相关病史，请在游玩前咨询医生。
+        </div>
+        <button class="continue-btn" id="continueBtn">继续</button>
     </div>
 
-    <!-- 主论坛 (白色) -->
+    <!-- ===== 主论坛 ===== -->
     <div class="forum-wrapper" id="forumWrapper">
-        <nav class="navbar">
-            <div class="navbar-brand">论坛</div>
-        </nav>
+        <nav class="navbar"><div class="navbar-brand">论坛</div></nav>
 
         <div class="top-meta">
             <div class="grey-circle"></div>
@@ -390,119 +664,119 @@
                 <span>你愿意建立契约吗？</span>
                 <span class="post-date">2026.7.18 21:33</span>
             </div>
+            <!-- 更新后的帖子内容（更长） -->
             <div class="post-content">
-                点击发布快来快来快来快来快来快来快来快来快来快来快来
+                点击发布快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来快来
             </div>
-            <!-- 永远显示“暂无回复。” -->
-            <div class="no-reply" id="noReplyText">暂无回复。</div>
 
-            <div class="reply-area">
-                <div class="reply-input-wrap">
-                    <input type="text" class="reply-input" id="replyInput" placeholder="说点什么吧" autocomplete="off">
-                    <button class="publish-btn" id="publishBtn">发布</button>
-                </div>
+            <!-- 评论区 -->
+            <div class="reply-section">
+                <hr class="divider-line">
+                <div class="comment-title">评论区</div>
+                <div class="no-reply">暂无评论。</div>
+            </div>
+
+            <!-- 评论输入框 -->
+            <div class="reply-input-wrap">
+                <input type="text" class="reply-input" id="replyInput" placeholder="说点什么吧" autocomplete="off">
+                <button class="publish-btn" id="publishBtn">发布</button>
             </div>
         </div>
     </div>
 
-    <!-- 第二页面 (新背景图 + 眩晕模糊动画) -->
+    <!-- ===== 第二页面 ===== -->
     <div class="second-page" id="secondPage">
+        <div class="second-page-bg" id="secondPageBg"></div>
         <div class="dark-frame">
             <div class="dark-message">
                 你好，亲爱的丝枢。<br>
                 欢迎来到精神最深层——髓核层。<br>
                 <span class="small-crooked">请你点击下方同意，成为祂的脐亲。</span>
             </div>
-
             <div class="agree-wrapper">
-                <!-- 同意按钮 -->
                 <button class="agree-btn" id="agreeBtn">同意</button>
-                <!-- 倒计时 (红色小字，在同意下方) -->
                 <div class="countdown-timer" id="countdownDisplay">10</div>
             </div>
         </div>
     </div>
 
+    <!-- ===== 加载指示器 ===== -->
+    <div class="loading-indicator" id="loadingIndicator">
+        <div class="spinner"></div>
+        <div class="loading-text">加载中...</div>
+    </div>
+
     <script>
         (function() {
-            // 预加载新背景图
+            // ---- 第零个界面逻辑 ----
+            const zeroPage = document.getElementById('zeroPage');
+            const continueBtn = document.getElementById('continueBtn');
+            const forumWrapper = document.getElementById('forumWrapper');
+
+            continueBtn.addEventListener('click', function() {
+                zeroPage.classList.add('transitioning');
+                setTimeout(() => {
+                    zeroPage.style.display = 'none';
+                    forumWrapper.classList.add('visible');
+                }, 1600);
+            });
+
+            // ---- 预加载背景图 ----
             const bgImg = new Image();
             bgImg.src = 'https://i.postimg.cc/PxDRRQT6/ning-shi-1-yin-shuang-yu-xue-lai-zi-xiao-hong-shu-wang-ye-ban.jpg';
 
-            // DOM 元素
+            // ---- 主论坛交互逻辑 ----
             const replyInput = document.getElementById('replyInput');
             const publishBtn = document.getElementById('publishBtn');
             const secondPage = document.getElementById('secondPage');
+            const secondPageBg = document.getElementById('secondPageBg');
             const agreeBtn = document.getElementById('agreeBtn');
             const loadingIndicator = document.getElementById('loadingIndicator');
             const countdownDisplay = document.getElementById('countdownDisplay');
 
-            // 倒计时相关
             let countdownInterval = null;
             let countdownValue = 10;
-            let isCountdownActive = false;
 
-            // 初始状态：发布按钮不可用
-            publishBtn.classList.remove('active');
-            publishBtn.disabled = true;
-
-            // 监听输入 —— 控制发布按钮
             replyInput.addEventListener('input', function() {
-                const val = this.value.trim();
-                if (val.length > 0) {
-                    publishBtn.classList.add('active');
-                    publishBtn.disabled = false;
-                } else {
-                    publishBtn.classList.remove('active');
-                    publishBtn.disabled = true;
-                }
+                const hasText = this.value.trim().length > 0;
+                publishBtn.classList.toggle('active', hasText);
+                publishBtn.disabled = !hasText;
             });
 
-            // 核心：点击发布 → 显示加载 (旋转光标) → 跳转第二页面 (带眩晕模糊)
             function handlePublish() {
-                const val = replyInput.value.trim();
-                if (val.length === 0) return;
+                if (replyInput.value.trim().length === 0) return;
 
-                // 1. 显示加载中 (含旋转光标)
                 loadingIndicator.classList.add('show');
 
-                // 2. 模拟加载时间 (2.5秒)，背景图已预加载
                 setTimeout(() => {
                     loadingIndicator.classList.remove('show');
-
-                    // 3. 显示第二页面 (触发眩晕模糊过渡)
+                    secondPage.classList.remove('show');
+                    void secondPage.offsetHeight;
+                    secondPageBg.style.animation = 'none';
+                    void secondPageBg.offsetHeight;
+                    secondPageBg.style.animation = '';
                     secondPage.classList.add('show');
 
-                    // 4. 清空输入框，禁用发布按钮
                     replyInput.value = '';
                     publishBtn.classList.remove('active');
                     publishBtn.disabled = true;
 
-                    // 5. 启动倒计时 (10秒)
                     startCountdown();
-
-                }, 2500);
+                }, 1800);
             }
 
-            // 倒计时逻辑
             function startCountdown() {
-                if (countdownInterval) {
-                    clearInterval(countdownInterval);
-                    countdownInterval = null;
-                }
-
+                if (countdownInterval) clearInterval(countdownInterval);
                 countdownValue = 10;
                 countdownDisplay.textContent = countdownValue;
                 agreeBtn.classList.remove('active');
                 agreeBtn.style.color = '#888';
                 agreeBtn.style.cursor = 'not-allowed';
                 agreeBtn.style.pointerEvents = 'none';
-                isCountdownActive = true;
 
                 countdownInterval = setInterval(() => {
                     countdownValue -= 1;
                     countdownDisplay.textContent = countdownValue;
-
                     if (countdownValue <= 0) {
                         clearInterval(countdownInterval);
                         countdownInterval = null;
@@ -511,33 +785,24 @@
                         agreeBtn.style.color = 'white';
                         agreeBtn.style.cursor = 'pointer';
                         agreeBtn.style.pointerEvents = 'auto';
-                        isCountdownActive = false;
                     }
                 }, 1000);
             }
 
-            // 绑定发布事件
-            publishBtn.addEventListener('click', function(e) {
-                if (this.disabled) return;
-                handlePublish();
-            });
-
-            // 回车键发布
-            replyInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    const val = this.value.trim();
-                    if (val.length > 0 && publishBtn.classList.contains('active')) {
-                        e.preventDefault();
-                        handlePublish();
-                    }
+            publishBtn.addEventListener('click', handlePublish);
+            replyInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey && publishBtn.classList.contains('active')) {
+                    e.preventDefault();
+                    handlePublish();
                 }
             });
 
-            // 点击“同意” → 关闭第二页面，回到论坛
             agreeBtn.addEventListener('click', function() {
                 if (!this.classList.contains('active')) return;
-
                 secondPage.classList.remove('show');
+                secondPageBg.style.animation = 'none';
+                void secondPageBg.offsetHeight;
+                secondPageBg.style.animation = '';
 
                 if (countdownInterval) {
                     clearInterval(countdownInterval);
@@ -548,21 +813,14 @@
                 agreeBtn.style.color = '#888';
                 agreeBtn.style.cursor = 'not-allowed';
                 agreeBtn.style.pointerEvents = 'none';
-                isCountdownActive = false;
-
                 replyInput.value = '';
                 publishBtn.classList.remove('active');
                 publishBtn.disabled = true;
             });
 
-            // 点击第二页面背景不关闭 (仅同意关闭)
-            secondPage.addEventListener('click', function(e) {
-                if (e.target === secondPage) {
-                    // 不关闭
-                }
+            secondPage.addEventListener('click', (e) => {
+                if (e.target === secondPage) e.stopPropagation();
             });
-
-            console.log('2026 契约论坛 · 新背景图 + 眩晕模糊效果');
         })();
     </script>
 </body>
